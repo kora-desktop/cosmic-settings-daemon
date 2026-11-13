@@ -1,3 +1,10 @@
+## [1.11.4](https://github.com/kora-desktop/cosmic-settings-daemon/compare/v1.11.3...v1.11.4) (2026-11-13)
+
+
+### Bug Fixes
+
+* **shortcuts:** open Kora's desktop overview from the overview key ([b3a3e6e](https://github.com/kora-desktop/cosmic-settings-daemon/commit/b3a3e6e0f8f4bad95e68c4cb797962ae770073c3))
+
 ## [1.11.3](https://github.com/kora-desktop/cosmic-settings-daemon/compare/v1.11.2...v1.11.3) (2026-11-12)
 
 
