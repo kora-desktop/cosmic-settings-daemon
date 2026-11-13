@@ -65,5 +65,5 @@
     /// Opens the (alt+shift+tab) window switcher (AgentOS)
     WindowSwitcherPrevious: "kora-launcher shift-alt-tab",
     /// Opens the workspace overview
-    WorkspaceOverview: "cosmic-workspaces",
+    WorkspaceOverview: "kora-panel desktops",
 }
