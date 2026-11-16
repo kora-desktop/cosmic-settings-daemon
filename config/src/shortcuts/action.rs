@@ -101,6 +101,9 @@ pub enum Action {
     /// Change the orientation of a tiling group
     Orientation(Orientation),
 
+    /// Pick a colour from the screen and copy its value
+    PickColor,
+
     #[deprecated]
     /// Change focus to the previous output
     PreviousOutput,
@@ -356,6 +359,7 @@ mod tests {
             ),
             ("CaptureToolbar", Action::CaptureToolbar),
             ("StopRecording", Action::StopRecording),
+            ("PickColor", Action::PickColor),
         ] {
             assert_eq!(ron::from_str::<Action>(text).unwrap(), action);
             assert_eq!(ron::to_string(&action).unwrap(), text);
