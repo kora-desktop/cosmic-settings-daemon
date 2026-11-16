@@ -6,6 +6,9 @@ use serde::{Deserialize, Serialize};
 /// An operation which may be bound to a keyboard shortcut.
 #[derive(Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub enum Action {
+    /// Route an app convention, such as Copy or New tab, to the focused app
+    App(AppAction),
+
     /// Capture every display to a file, one per display
     CaptureScreen,
 
@@ -256,8 +259,34 @@ pub enum System {
     WindowSwitcher,
     /// Opens the (alt+shift+tab) window switcher
     WindowSwitcherPrevious,
+    /// Opens the window switcher over the focused app's windows only
+    WindowSwitcherApp,
+    /// Opens the same-app window switcher, cycling backwards
+    WindowSwitcherAppPrevious,
     /// Opens the workspace overview
     WorkspaceOverview,
+}
+
+/// A command that belongs to the focused app. The compositor routes the chord;
+/// the app decides what it means.
+#[derive(Copy, Clone, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
+pub enum AppAction {
+    /// Open a new window of the app
+    NewWindow,
+    /// Open a new tab in the app
+    NewTab,
+    /// Cut the selection
+    Cut,
+    /// Copy the selection
+    Copy,
+    /// Paste the clipboard
+    Paste,
+    /// Undo the last edit
+    Undo,
+    /// Redo the last undone edit
+    Redo,
+    /// Select everything
+    SelectAll,
 }
 
 /// Defines the direction of an operation
@@ -371,6 +400,32 @@ mod tests {
         for (text, action) in [
             ("FocusHalo", Action::FocusHalo),
             ("MoveToDesktop", Action::MoveToDesktop),
+        ] {
+            assert_eq!(ron::from_str::<Action>(text).unwrap(), action);
+            assert_eq!(ron::to_string(&action).unwrap(), text);
+        }
+    }
+
+    #[test]
+    fn shortcut_contract_actions_round_trip_through_ron() {
+        use super::{AppAction, System};
+        for (text, action) in [
+            ("App(NewWindow)", Action::App(AppAction::NewWindow)),
+            ("App(NewTab)", Action::App(AppAction::NewTab)),
+            ("App(Cut)", Action::App(AppAction::Cut)),
+            ("App(Copy)", Action::App(AppAction::Copy)),
+            ("App(Paste)", Action::App(AppAction::Paste)),
+            ("App(Undo)", Action::App(AppAction::Undo)),
+            ("App(Redo)", Action::App(AppAction::Redo)),
+            ("App(SelectAll)", Action::App(AppAction::SelectAll)),
+            (
+                "System(WindowSwitcherApp)",
+                Action::System(System::WindowSwitcherApp),
+            ),
+            (
+                "System(WindowSwitcherAppPrevious)",
+                Action::System(System::WindowSwitcherAppPrevious),
+            ),
         ] {
             assert_eq!(ron::from_str::<Action>(text).unwrap(), action);
             assert_eq!(ron::to_string(&action).unwrap(), text);

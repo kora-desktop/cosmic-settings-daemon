@@ -64,6 +64,10 @@
     WindowSwitcher: "kora-launcher alt-tab",
     /// Opens the (alt+shift+tab) window switcher (AgentOS)
     WindowSwitcherPrevious: "kora-launcher shift-alt-tab",
+    /// Opens the window switcher over the focused app's windows (AgentOS)
+    WindowSwitcherApp: "kora-launcher alt-tab-app",
+    /// Opens the same-app window switcher backwards (AgentOS)
+    WindowSwitcherAppPrevious: "kora-launcher shift-alt-tab-app",
     /// Opens the workspace overview
     WorkspaceOverview: "kora-panel desktops",
 }
