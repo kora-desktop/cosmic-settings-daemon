@@ -1,6 +1,6 @@
 Name:           cosmic-settings-daemon
 Epoch:          1
-Version: 1.11.4
+Version: 1.12.0
 Release:        1%{?dist}
 Summary:        COSMIC Settings Daemon (Playtron fork)
 

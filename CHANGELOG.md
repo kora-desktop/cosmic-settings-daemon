@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/kora-desktop/cosmic-settings-daemon/compare/v1.11.4...v1.12.0) (2026-11-16)
+
+
+### Features
+
+* **config:** add the PickColor shortcut action ([d69e88e](https://github.com/kora-desktop/cosmic-settings-daemon/commit/d69e88e58fa2c6d2c03999118fc19e84eab49b21))
+
 ## [1.11.4](https://github.com/kora-desktop/cosmic-settings-daemon/compare/v1.11.3...v1.11.4) (2026-11-13)
 
 
