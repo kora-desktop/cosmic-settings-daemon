@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/kora-desktop/cosmic-settings-daemon/compare/v1.12.0...v1.13.0) (2026-11-16)
+
+
+### Features
+
+* **shortcuts:** add app commands and the same-app window switcher ([e6596cb](https://github.com/kora-desktop/cosmic-settings-daemon/commit/e6596cb6fb5b1b1648ecaa9d9165c123150d831d))
+
 # [1.12.0](https://github.com/kora-desktop/cosmic-settings-daemon/compare/v1.11.4...v1.12.0) (2026-11-16)
 
 
