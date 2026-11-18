@@ -215,6 +215,8 @@ pub enum System {
     KeyboardBrightnessDown,
     /// Increases keyboard brightness
     KeyboardBrightnessUp,
+    /// Turns the keyboard backlight off, or back on at its last level
+    KeyboardBrightnessToggle,
     /// Opens the launcher
     Launcher,
     /// Locks the screen
