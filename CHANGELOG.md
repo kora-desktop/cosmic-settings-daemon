@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/kora-desktop/cosmic-settings-daemon/compare/v1.13.0...v1.13.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* **brightness:** control the keyboard backlight through UPower ([6d37eb2](https://github.com/kora-desktop/cosmic-settings-daemon/commit/6d37eb25ac2be68aed5367ac75c2ac0720e74a41))
+
 # [1.13.0](https://github.com/kora-desktop/cosmic-settings-daemon/compare/v1.12.0...v1.13.0) (2026-11-16)
 
 
