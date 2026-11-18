@@ -31,6 +31,7 @@ RUN dpkg --add-architecture arm64 && \
       rpm \
       librpmbuild10 \
       elfutils \
+      dbus-daemon \
       curl \
       ca-certificates && \
     rm -rf /var/lib/apt/lists/*

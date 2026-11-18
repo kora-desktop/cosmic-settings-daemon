@@ -23,9 +23,11 @@
     /// Logs out
     LogOut: "cosmic-osd log-out",
     /// Decreases keyboard brightness
-    // KeyboardBrightnessDown,
+    KeyboardBrightnessDown: "busctl --user call com.system76.CosmicSettingsDaemon /com/system76/CosmicSettingsDaemon com.system76.CosmicSettingsDaemon DecreaseKeyboardBrightness",
     /// Increases keyboard brightness
-    // KeyboardBrightnessUp,
+    KeyboardBrightnessUp: "busctl --user call com.system76.CosmicSettingsDaemon /com/system76/CosmicSettingsDaemon com.system76.CosmicSettingsDaemon IncreaseKeyboardBrightness",
+    /// Turns the keyboard backlight off, or back on at its last level
+    KeyboardBrightnessToggle: "busctl --user call com.system76.CosmicSettingsDaemon /com/system76/CosmicSettingsDaemon com.system76.CosmicSettingsDaemon ToggleKeyboardBacklight",
     /// Opens the launcher
     Launcher: "cosmic-launcher",
     /// Locks the screen

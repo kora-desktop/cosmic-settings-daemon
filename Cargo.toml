@@ -83,6 +83,9 @@ cctk = { package = "cosmic-client-toolkit", git = "https://github.com/pop-os/cos
 calloop = "0.14.4"
 calloop-wayland-source = "0.4.1"
 
+[dev-dependencies]
+tempfile = "3"
+
 # For development and testing purposes
 # [patch.'https://github.com/pop-os/libcosmic']
 # libcosmic = { git = "https://github.com/pop-os/libcosmic//", branch = "theme-v2" }

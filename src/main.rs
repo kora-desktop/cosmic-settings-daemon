@@ -32,6 +32,7 @@ mod battery;
 mod brightness_device;
 mod greeter;
 mod icetron;
+mod kbd_backlight;
 mod locale;
 mod location;
 mod logind_session;
@@ -60,6 +61,7 @@ struct SettingsDaemon {
     logind_session: Option<LogindSessionProxy<'static>>,
     a11y_session: Option<Mutex<cosmic_dbus_a11y::StatusProxy<'static>>>,
     display_brightness_device: BrightnessDevice,
+    kbd_backlight: Option<Arc<kbd_backlight::KbdBacklight>>,
     watched_configs: Arc<
         RwLock<HashMap<(String, u64), (Connection, ObjectPath<'static>, WellKnownName<'static>)>>,
     >,
@@ -213,11 +215,26 @@ impl SettingsDaemon {
 
     #[zbus(property)]
     async fn keyboard_brightness(&self) -> i32 {
-        -1
+        match self.kbd_backlight.as_ref() {
+            Some(kbd) => kbd.brightness().await.unwrap_or(-1),
+            None => -1,
+        }
     }
 
     #[zbus(property)]
-    async fn set_keyboard_brightness(&self, _value: i32) {}
+    async fn max_keyboard_brightness(&self) -> i32 {
+        match self.kbd_backlight.as_ref() {
+            Some(kbd) => kbd.max_brightness().await.unwrap_or(-1),
+            None => -1,
+        }
+    }
+
+    #[zbus(property)]
+    async fn set_keyboard_brightness(&self, value: i32) {
+        if let Some(kbd) = self.kbd_backlight.as_ref() {
+            kbd.set_brightness(value).await;
+        }
+    }
 
     async fn increase_display_brightness(
         &self,
@@ -241,9 +258,24 @@ impl SettingsDaemon {
         _ = self.display_brightness_changed(&emitter).await;
     }
 
-    async fn increase_keyboard_brightness(&self) {}
+    // UPower announces each change, which updates KeyboardBrightness and the OSD.
+    async fn increase_keyboard_brightness(&self) {
+        if let Some(kbd) = self.kbd_backlight.as_ref() {
+            kbd.step(1).await;
+        }
+    }
 
-    async fn decrease_keyboard_brightness(&self) {}
+    async fn decrease_keyboard_brightness(&self) {
+        if let Some(kbd) = self.kbd_backlight.as_ref() {
+            kbd.step(-1).await;
+        }
+    }
+
+    async fn toggle_keyboard_backlight(&self) {
+        if let Some(kbd) = self.kbd_backlight.as_ref() {
+            kbd.toggle().await;
+        }
+    }
 
     async fn screen_reader(&mut self) {
         if let Some(a11y) = self.a11y_session.as_ref() {
@@ -437,6 +469,35 @@ async fn backlight_monitor_task(
     };
 }
 
+/// Republishes UPower's keyboard backlight changes as `KeyboardBrightness`.
+async fn kbd_backlight_monitor_task(
+    kbd: Arc<kbd_backlight::KbdBacklight>,
+    connection: zbus::Connection,
+) {
+    let mut changes = match kbd.changes().await {
+        Ok(changes) => Box::pin(changes),
+        Err(err) => {
+            log::error!("Failed to follow the keyboard backlight: {err}");
+            return;
+        }
+    };
+    let Ok(interface) = connection
+        .object_server()
+        .interface::<_, SettingsDaemon>(DBUS_PATH)
+        .await
+    else {
+        return;
+    };
+    while let Some(level) = changes.next().await {
+        kbd.observe(level);
+        _ = interface
+            .get()
+            .await
+            .keyboard_brightness_changed(interface.signal_emitter())
+            .await;
+    }
+}
+
 #[derive(Debug)]
 pub enum Change {
     Config(String, String, u64),
@@ -566,6 +627,15 @@ async fn main() -> ExitCode {
             }
             .await;
 
+            let kbd_backlight = async {
+                let connection = zbus::Connection::system().await?;
+                kbd_backlight::KbdBacklight::new(&connection).await
+            }
+            .await
+            .inspect_err(|err| log::error!("No keyboard backlight control: {err}"))
+            .ok()
+            .map(Arc::new);
+
             let a11y_session = async {
                 let connection = zbus::Connection::session().await?;
                 cosmic_dbus_a11y::StatusProxy::builder(&connection)
@@ -660,6 +730,7 @@ async fn main() -> ExitCode {
                 logind_session: logind_session.ok(),
                 a11y_session: a11y_session.ok().map(Mutex::new),
                 display_brightness_device,
+                kbd_backlight: kbd_backlight.clone(),
                 watched_configs: watched_configs.clone(),
                 watched_states: watched_states.clone(),
                 wayland_sender: wayland::run(),
@@ -675,6 +746,10 @@ async fn main() -> ExitCode {
             task::spawn_local(async move {
                 backlight_monitor_task(backlights, conn_clone).await;
             });
+
+            if let Some(kbd) = kbd_backlight {
+                task::spawn_local(kbd_backlight_monitor_task(kbd, connection.clone()));
+            }
 
             tokio::task::spawn_local(battery::monitor());
 
